@@ -1,0 +1,38 @@
+﻿@using TodoList.Models
+
+@if (item.Completed)
+{
+    <div style="background-color: #A79FEF">
+        <MudCheckBox @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;"><del>@item.Content</del></span>
+    </div>
+}
+else
+{
+    <div style="@Style">
+        <div>
+            <MudCheckBox @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Content</span>
+        </div>
+        <div>
+            <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch @bind-Checked="@item.Important" Color="Color.Secondary" @onclick="ImportantChange" Style="margin-bottom: 0;"/>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public ToDoItem item { get; set; }
+    private string PlaceHolder = "Write a todo item...";
+    private string Style = string.Empty;
+    private void ImportantChange()
+    {
+        if (!item.Important)
+        {
+            Style = "background-color: #FF96B9";
+        }
+        else
+        {
+            Style = string.Empty;
+        }
+    }
+}
