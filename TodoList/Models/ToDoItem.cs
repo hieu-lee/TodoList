@@ -11,7 +11,7 @@ namespace TodoList.Models
         public DateTime TimeCreate { get; set; }
         public bool Important { get; set; } = false;
         public bool Completed { get; set; } = false;
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
         public string Title { get; set; }
 
         public override bool Equals(object obj)
