@@ -13,6 +13,8 @@ namespace TodoList.Models
         public bool Completed { get; set; } = false;
         public string Content { get; set; } = string.Empty;
         public string Title { get; set; }
+        public string ContentHeight { get; set; } = "0";
+        public string DeleteHeight { get; set; } = "0";
 
         public override bool Equals(object obj)
         {

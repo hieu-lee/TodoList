@@ -9,7 +9,7 @@
             <MudTextField T="string" FullWidth="true" Placeholder="Title" @bind-Value="@NewTitle" Style="margin: 0 10px;"></MudTextField>
         </div>
         <div style="margin-right: 12px; margin-top: 12px;">
-            <img @onclick="ShowMore" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+            <img @onclick="ShowNewContent" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
         </div>
     </div>
     <div>
@@ -23,19 +23,99 @@
 <ul>
     @foreach (var item in ImportantItems)
     {
-        <li>
-            <TodoItem item="item" list="list" ImportantItems="ImportantItems" CompletedItems="CompletedItems" UncompletedItems="UncompletedItems"></TodoItem>
-            <hr />
-        </li>
+    <li>
+        @if (item.Completed)
+        {
+            <div style="background-color: #A79FEF;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <MudCheckBox @onclick="() => { ChangeCompletion(item); }" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;"><del>@item.Title</del></span>
+                    </div>
+                    <div style="margin-right: 12px; margin-top: 12px;">
+                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                    </div>
+                </div>
+                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                </div>
+            </div>
+            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                <img style="width: 30px; height: 30px;" src="trash.png" />
+            </div>
+        }
+        else
+        {
+            <div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <MudCheckBox @bind-Checked="@item.Completed" Color="Color.Primary" @onclick="() => { ChangeCompletion(item); }"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                    </div>
+                    <div style="margin-right: 12px; margin-top: 12px;">
+                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                    </div>
+                </div>
+                <div>
+                    <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch @bind-Checked="@item.Important" Color="Color.Secondary" @onclick="() => { ImportantChange(item); }" Style="margin-bottom: 0;" />
+                </div>
+                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                </div>
+            </div>
+            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                <img style="width: 30px; height: 30px;" src="trash.png" />
+            </div>
+        }
+        <hr />
+    </li>
     }
 </ul>
 <ul>
     @foreach (var item in UncompletedItems)
     {
-        <li>
-            <TodoItem item="item" list="list" ImportantItems="ImportantItems" CompletedItems="CompletedItems" UncompletedItems="UncompletedItems"></TodoItem>
-            <hr />
-        </li>
+    <li>
+        @if (item.Completed)
+        {
+            <div style="background-color: #A79FEF;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <MudCheckBox @onclick="() => { ChangeCompletion(item); }" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;"><del>@item.Title</del></span>
+                    </div>
+                    <div style="margin-right: 12px; margin-top: 12px;">
+                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                    </div>
+                </div>
+                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                </div>
+            </div>
+            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                <img style="width: 30px; height: 30px;" src="trash.png" />
+            </div>
+        }
+        else
+        {
+            <div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <MudCheckBox @bind-Checked="@item.Completed" Color="Color.Primary" @onclick="() => { ChangeCompletion(item); }"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                    </div>
+                    <div style="margin-right: 12px; margin-top: 12px;">
+                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                    </div>
+                </div>
+                <div>
+                    <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch @bind-Checked="@item.Important" Color="Color.Secondary" @onclick="() => { ImportantChange(item); }" Style="margin-bottom: 0;" />
+                </div>
+                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                </div>
+            </div>
+            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                <img style="width: 30px; height: 30px;" src="trash.png" />
+            </div>
+        }
+        <hr />
+    </li>
     }
 </ul>
 <div style="display: flex; justify-content: space-between;">
@@ -48,10 +128,50 @@
     <ul>
         @foreach (var item in CompletedItems)
         {
-            <li>
-                <TodoItem item="item" list="list" ImportantItems="ImportantItems" CompletedItems="CompletedItems" UncompletedItems="UncompletedItems"></TodoItem>
-                <hr />
-            </li>
+        <li>
+            @if (item.Completed)
+            {
+                <div style="background-color: #A79FEF;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <MudCheckBox @onclick="() => { ChangeCompletion(item); }" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;"><del>@item.Title</del></span>
+                        </div>
+                        <div style="margin-right: 12px; margin-top: 12px;">
+                            <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                        </div>
+                    </div>
+                    <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                        <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                    </div>
+                </div>
+                <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                    <img style="width: 30px; height: 30px;" src="trash.png" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <MudCheckBox @bind-Checked="@item.Completed" Color="Color.Primary" @onclick="() => { ChangeCompletion(item); }"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                        </div>
+                        <div style="margin-right: 12px; margin-top: 12px;">
+                            <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                        </div>
+                    </div>
+                    <div>
+                        <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch @bind-Checked="@item.Important" Color="Color.Secondary" @onclick="() => { ImportantChange(item); }" Style="margin-bottom: 0;" />
+                    </div>
+                    <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                        <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                    </div>
+                </div>
+                <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                    <img style="width: 30px; height: 30px;" src="trash.png" />
+                </div>
+            }
+            <hr />
+        </li>
         }
     </ul>
 </div>
@@ -71,7 +191,7 @@ Welcome to your new app.
     HashSet<ToDoItem> CompletedItems = new();
     HashSet<ToDoItem> ImportantItems = new();
 
-    private void ShowMore()
+    private void ShowNewContent()
     {
         if (ContentHeight == "0")
         {
@@ -116,5 +236,80 @@ Welcome to your new app.
             UncompletedItems.Add(NewItem);
         }
         ResetFields();
+    }
+
+    private void ChangeCompletion(ToDoItem item)
+    {
+        if (!item.Completed)
+        {
+            CompletedItems.Add(item);
+            if (item.Important)
+            {
+                ImportantItems.Remove(item);
+            }
+            else
+            {
+                UncompletedItems.Remove(item);
+            }
+        }
+        else
+        {
+            CompletedItems.Remove(item);
+            if (item.Important)
+            {
+                ImportantItems.Add(item);
+            }
+            else
+            {
+                UncompletedItems.Add(item);
+            }
+        }
+    }
+
+    private void ImportantChange(ToDoItem item)
+    {
+        if (!item.Important)
+        {
+            ImportantItems.Add(item);
+            UncompletedItems.Remove(item);
+            StateHasChanged();
+        }
+        else
+        {
+            ImportantItems.Remove(item);
+            UncompletedItems.Add(item);
+            StateHasChanged();
+        }
+    }
+
+    private void DeleteItem(ToDoItem item)
+    {
+        list.Items.Remove(item);
+        if (item.Completed)
+        {
+            CompletedItems.Remove(item);
+        }
+        else if (item.Important)
+        {
+            ImportantItems.Remove(item);
+        }
+        else
+        {
+            UncompletedItems.Remove(item);
+        }
+    }
+
+    private void ShowMore(ToDoItem item)
+    {
+        if (item.DeleteHeight == "0")
+        {
+            item.ContentHeight = "100px";
+            item.DeleteHeight = "30px";
+        }
+        else
+        {
+            item.ContentHeight = "0";
+            item.DeleteHeight = "0";
+        }
     }
 }
