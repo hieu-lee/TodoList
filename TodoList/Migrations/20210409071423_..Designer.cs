@@ -9,7 +9,7 @@ using TodoList.Data;
 namespace TodoList.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20210409050353_.")]
+    [Migration("20210409071423_.")]
     partial class _
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,15 +87,12 @@ namespace TodoList.Migrations
 
                     b.HasIndex("ToDoListListId");
 
-                    b.ToTable("ToDoItem");
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("TodoList.Models.ToDoList", b =>
                 {
                     b.Property<string>("ListId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Accountusername")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DeleteHeight")
@@ -104,36 +101,17 @@ namespace TodoList.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Ownerusername")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("TimeCreate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ListId");
 
-                    b.HasIndex("Accountusername");
+                    b.HasIndex("Ownerusername");
 
                     b.ToTable("Lists");
-                });
-
-            modelBuilder.Entity("TodoList.Models.Username", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ListId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ToDoListListId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("username")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ToDoListListId");
-
-                    b.ToTable("Username");
                 });
 
             modelBuilder.Entity("TodoList.Models.ToDoItem", b =>
@@ -145,16 +123,11 @@ namespace TodoList.Migrations
 
             modelBuilder.Entity("TodoList.Models.ToDoList", b =>
                 {
-                    b.HasOne("TodoList.Models.Account", null)
+                    b.HasOne("TodoList.Models.Account", "Owner")
                         .WithMany("lists")
-                        .HasForeignKey("Accountusername");
-                });
+                        .HasForeignKey("Ownerusername");
 
-            modelBuilder.Entity("TodoList.Models.Username", b =>
-                {
-                    b.HasOne("TodoList.Models.ToDoList", null)
-                        .WithMany("Owners")
-                        .HasForeignKey("ToDoListListId");
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("TodoList.Models.Account", b =>
@@ -165,8 +138,6 @@ namespace TodoList.Migrations
             modelBuilder.Entity("TodoList.Models.ToDoList", b =>
                 {
                     b.Navigation("Items");
-
-                    b.Navigation("Owners");
                 });
 #pragma warning restore 612, 618
         }

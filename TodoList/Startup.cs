@@ -1,3 +1,4 @@
+using ElectronNET.API;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
+using System.Threading.Tasks;
 using TodoList.Data;
 using TodoList.Services;
 
@@ -33,7 +35,6 @@ namespace TodoList
             services.AddScoped<ListsService>();
             services.AddSingleton<EncryptionAndCompressService>();
             services.AddScoped<SessionsService>();
-            services.AddSingleton<StateService>();
             services.AddMudServices();
         }
 
@@ -61,6 +62,7 @@ namespace TodoList
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+            Task.Run(async () => await Electron.WindowManager.CreateWindowAsync());
         }
     }
 }

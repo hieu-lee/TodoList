@@ -1,6 +1,5 @@
 ﻿@page "/"
 @using TodoList.Models;
-@inject StateService stateService
 @inject SessionsService sessionsService
 @inject ListsService listsService
 @inject NavigationManager navigationManager
@@ -48,35 +47,33 @@
         HashSet<ToDoList> MyLists = new();
 
         protected override async Task OnInitializedAsync()
+    {
+        if (sessionsService.session.logged)
         {
-            if (sessionsService.session.logged)
+            username = sessionsService.session.username;
+            var res = listsService.GetLists(username);
+            if (res.success)
             {
-                username = sessionsService.session.username;
-                var res = listsService.GetLists(username);
-                if (res.success)
-                {
-                    MyLists = res.lists;
-                    return;
-                }
-                else
-                {
-                    navigationManager.NavigateTo("/log");
-                }
+                MyLists = res.lists;
+                return;
             }
-            navigationManager.NavigateTo("/log");
-
+            else
+            {
+                navigationManager.NavigateTo("/log");
+            }
         }
+        navigationManager.NavigateTo("/log");
 
-        private async Task AddNewList()
-        {
+    }
+
+    private async Task AddNewList()
+    {
         if (string.IsNullOrWhiteSpace(NewName))
         {
             return;
         }
         NewName = NewName.Trim();
-        var Owners = new HashSet<Username>();
-        Owners.Add(new(sessionsService.session.username));
-        ToDoList NewList = new() { Owners = Owners, Name = NewName };
+        ToDoList NewList = new() { Owner = new() { username = sessionsService.session.username }, Name = NewName };
         MyLists.Add(NewList);
         await listsService.CreateNewListAsync(sessionsService.session.username, NewList);
         NewName = string.Empty;
@@ -84,7 +81,6 @@
 
     private void ManageList(ToDoList list)
     {
-        stateService.Owners = list.Owners;
         navigationManager.NavigateTo($"/list/{list.ListId}/{list.Name}");
     }
 

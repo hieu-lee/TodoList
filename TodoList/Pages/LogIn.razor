@@ -2,7 +2,6 @@
 @page "/log/{register:bool}"
 @using TodoList.Models;
 @inject SessionsService sessionsService
-@inject StateService stateService
 @inject AccountsService accountService
 @inject IJSRuntime JsRuntime
 @inject NavigationManager navigationManager
@@ -140,7 +139,6 @@ else
     private void SignOut()
     {
         sessionsService.SignOut();
-        stateService.Owners = new();
         navigationManager.NavigateTo("/");
     }
 }

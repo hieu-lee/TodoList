@@ -40,22 +40,22 @@ namespace TodoList.Migrations
                     ListId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: true),
                     TimeCreate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    DeleteHeight = table.Column<string>(type: "TEXT", nullable: true),
-                    Accountusername = table.Column<string>(type: "TEXT", nullable: true)
+                    Ownerusername = table.Column<string>(type: "TEXT", nullable: true),
+                    DeleteHeight = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Lists", x => x.ListId);
                     table.ForeignKey(
-                        name: "FK_Lists_Accounts_Accountusername",
-                        column: x => x.Accountusername,
+                        name: "FK_Lists_Accounts_Ownerusername",
+                        column: x => x.Ownerusername,
                         principalTable: "Accounts",
                         principalColumn: "username",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ToDoItem",
+                name: "Items",
                 columns: table => new
                 {
                     ItemId = table.Column<string>(type: "TEXT", nullable: false),
@@ -72,30 +72,9 @@ namespace TodoList.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ToDoItem", x => x.ItemId);
+                    table.PrimaryKey("PK_Items", x => x.ItemId);
                     table.ForeignKey(
-                        name: "FK_ToDoItem_Lists_ToDoListListId",
-                        column: x => x.ToDoListListId,
-                        principalTable: "Lists",
-                        principalColumn: "ListId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Username",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    username = table.Column<string>(type: "TEXT", nullable: true),
-                    ListId = table.Column<string>(type: "TEXT", nullable: true),
-                    ToDoListListId = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Username", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Username_Lists_ToDoListListId",
+                        name: "FK_Items_Lists_ToDoListListId",
                         column: x => x.ToDoListListId,
                         principalTable: "Lists",
                         principalColumn: "ListId",
@@ -103,31 +82,23 @@ namespace TodoList.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Lists_Accountusername",
+                name: "IX_Items_ToDoListListId",
+                table: "Items",
+                column: "ToDoListListId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lists_Ownerusername",
                 table: "Lists",
-                column: "Accountusername");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ToDoItem_ToDoListListId",
-                table: "ToDoItem",
-                column: "ToDoListListId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Username_ToDoListListId",
-                table: "Username",
-                column: "ToDoListListId");
+                column: "Ownerusername");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Items");
+
+            migrationBuilder.DropTable(
                 name: "Sessions");
-
-            migrationBuilder.DropTable(
-                name: "ToDoItem");
-
-            migrationBuilder.DropTable(
-                name: "Username");
 
             migrationBuilder.DropTable(
                 name: "Lists");

@@ -1,7 +1,6 @@
 ﻿@page "/list/{listid}/{listname}"
 @inject SessionsService sessionsService
 @inject ListsService listsService
-@inject StateService stateService
 @inject IJSRuntime JsRuntime
 @using TodoList.Models
 
@@ -107,9 +106,11 @@
                                 <div>
                                     <div style="display: flex; justify-content: space-between;">
                                         <div>
-                                            <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                            <div>
+                                                <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                            </div>
+                                            <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                         </div>
-                                        <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                         <div style="margin-right: 20px; margin-top: 12px;">
                                             <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
                                         </div>
@@ -153,7 +154,7 @@
                 </Virtualize>
             </ul>
         </MudTabPanel>
-        <MudTabPanel Text="Completed Tasks">
+        <MudTabPanel Text="Uncompleted Tasks">
             <ul>
                 <Virtualize Items="Items" Context="item">
                     @if (!item.Completed)
@@ -162,9 +163,11 @@
                             <div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <div>
-                                        <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                        <div>
+                                            <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                        </div>
+                                        <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                     </div>
-                                    <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                     <div style="margin-right: 12px; margin-top: 12px;">
                                         <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
                                     </div>
@@ -194,9 +197,11 @@
                             <div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <div>
-                                        <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                        <div>
+                                            <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                        </div>
+                                        <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                     </div>
-                                    <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                     <div style="margin-right: 12px; margin-top: 12px;">
                                         <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
                                     </div>
@@ -255,21 +260,21 @@ else
 
 
 @code {
-    [Parameter]
-    public string listid { get; set; }
-    [Parameter]
-    public string listname { get; set; }
-    DateTime? NewDate;
-    TimeSpan? NewTime;
-    bool Authorized = false;
-    bool NewImportant = false;
-    string NewTitle = string.Empty;
-    string NewContent = string.Empty;
-    string ContentHeight = "0";
-    string ImportantDisplay = "block";
-    string UncompletedDisplay = "block";
-    string CompletedDisplay = "none";
-    HashSet<ToDoItem> Items = new();
+        [Parameter]
+        public string listid { get; set; }
+        [Parameter]
+        public string listname { get; set; }
+        DateTime? NewDate;
+        TimeSpan? NewTime;
+        bool Authorized = false;
+        bool NewImportant = false;
+        string NewTitle = string.Empty;
+        string NewContent = string.Empty;
+        string ContentHeight = "0";
+        string ImportantDisplay = "block";
+        string UncompletedDisplay = "block";
+        string CompletedDisplay = "none";
+        HashSet<ToDoItem> Items = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -291,7 +296,7 @@ else
             item.DeleteHeight = "0";
             item.ContentHeight = "0";
         });
-        var NewList = new ToDoList() { ListId = listid, Items = Items, Owners = stateService.Owners };
+        var NewList = new ToDoList() { ListId = listid, Items = Items, Owner = new() { username = sessionsService.session.username } };
         await listsService.UpdateListAsync(sessionsService.session.username, NewList);
     }
 
@@ -348,6 +353,8 @@ else
         NewImportant = false;
         NewTitle = string.Empty;
         NewContent = string.Empty;
+        NewDate = null;
+        NewTime = null;
         ContentHeight = "0";
     }
 

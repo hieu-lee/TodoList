@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TodoList.Models;
 
 namespace TodoList.Data
@@ -12,6 +8,8 @@ namespace TodoList.Data
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<ToDoList> Lists { get; set; }
+        public DbSet<ToDoItem> Items { get; set; }
+
         public TodoDbContext(DbContextOptions<TodoDbContext> options)
             : base(options)
         {
