@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor.Services;
 using TodoList.Data;
 using TodoList.Services;
 
@@ -28,10 +29,12 @@ namespace TodoList
             {
                 options.UseSqlite("Data Source = todolist.db");
             }, ServiceLifetime.Singleton);
-            services.AddSingleton<AccountsService>();
-            services.AddSingleton<ListsService>();
+            services.AddScoped<AccountsService>();
+            services.AddScoped<ListsService>();
             services.AddSingleton<EncryptionAndCompressService>();
-            services.AddSingleton<SessionsService>();
+            services.AddScoped<SessionsService>();
+            services.AddSingleton<StateService>();
+            services.AddMudServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

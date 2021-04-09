@@ -22,6 +22,7 @@ namespace TodoList.Services
         {
             try
             {
+                account.password = encryptionService.Encrypt(account.password);
                 dbContext.Accounts.Add(account);
                 sessionsService.SignUp(account);
                 return new() { success = true };
@@ -45,11 +46,6 @@ namespace TodoList.Services
             }
             sessionsService.SignIn(account);
             return new() { success = true };
-        }
-
-        public void SignOut()
-        {
-            sessionsService.SignOut();
         }
     }
 }

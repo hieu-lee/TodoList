@@ -10,8 +10,9 @@ namespace TodoList.Models
         public string ListId { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; }
         public DateTime TimeCreate { get; set; } = DateTime.UtcNow.ToLocalTime();
-        public HashSet<Account> Owners { get; set; } = new();
+        public HashSet<Username> Owners { get; set; } = new();
         public HashSet<ToDoItem> Items { get; set; } = new();
+        public string DeleteHeight { get; set; } = "0";
 
         public override bool Equals(object obj)
         {

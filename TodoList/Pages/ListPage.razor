@@ -1,0 +1,388 @@
+﻿@page "/list/{listid}/{listname}"
+@inject SessionsService sessionsService
+@inject ListsService listsService
+@inject StateService stateService
+@inject IJSRuntime JsRuntime
+@using TodoList.Models
+
+@if (Authorized)
+{
+    <h1 style="text-align: center;">@listname</h1>
+    <div style="display: flex; justify-content:center;">
+        <MudButton OnClick="SaveListAsync" Variant="Variant.Filled" Color="Color.Primary">Save List</MudButton>
+    </div>
+    <div>
+        <div style="display: flex; justify-content: space-between;">
+            <div style="display: flex;">
+                <img @onclick="AddNewItem" style="width: 30px; height: 30px; margin-left: 12px; margin-top: 10px; cursor: pointer;" src="add.png" />
+                <MudTextField T="string" FullWidth="true" Placeholder="Title" @bind-Value="@NewTitle" Style="margin: 0 10px;"></MudTextField>
+
+            </div>
+            <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
+                <MudDatePicker Label="Work Date" @bind-Date="NewDate" DateFormat="dd/MM/yyyy" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
+                <MudTimePicker Label="Work Time" @bind-Time="NewTime" />
+            </MudItem>
+            <div style="margin-right: 12px; margin-top: 12px;">
+                <img @onclick="ShowNewContent" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+            </div>
+        </div>
+        <div>
+            <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch @bind-Checked="@NewImportant" Color="Color.Secondary" Style="margin-bottom: 0;" />
+        </div>
+        <div style="height: @ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+            <MudTextField Placeholder="Content" T="string" Variant="Variant.Outlined" @bind-Value="@NewContent" Lines="3" FullWidth="true" />
+        </div>
+    </div>
+    <hr />
+    <MudTabs Elevation="3" Rounded="true" Centered="true" ApplyEffectsToContainer="true">
+        <MudTabPanel Text="All Tasks">
+            <ul>
+                <Virtualize Items="Items" Context="item">
+                    @if (!item.Completed)
+                    {
+                        <li>
+                            <div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <div>
+                                            <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                        </div>
+                                        <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
+                                    </div>
+                                    <div style="margin-right: 12px; margin-top: 12px;">
+                                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch DisableRipple="true" @bind-Checked="item.Important" Color="Color.Secondary" Style="margin-bottom: 0;" />
+                                </div>
+                                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                                </div>
+                            </div>
+                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                                <img style="width: 30px; height: 30px;" src="trash.png" />
+                            </div>
+                            <hr />
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <div style="background-color: #A79FEF;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;"><del>@item.Title</del></span>
+                                    </div>
+                                    <div style="margin-right: 12px; margin-top: 12px;">
+                                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                                    </div>
+                                </div>
+                                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                                </div>
+                            </div>
+                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                                <img style="width: 30px; height: 30px;" src="trash.png" />
+                            </div>
+                            <hr />
+                        </li>
+                    }
+                </Virtualize>
+            </ul>
+        </MudTabPanel>
+        <MudTabPanel Text="Today Tasks">
+            <ul>
+                <Virtualize Items="Items" Context="item">
+                    @if (item.TimeRemind.Date == DateTime.Today)
+                    {
+                        if (!item.Completed)
+                        {
+                            <li>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <div>
+                                            <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                        </div>
+                                        <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
+                                        <div style="margin-right: 12px; margin-top: 12px;">
+                                            <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch DisableRipple="true" @bind-Checked="item.Important" Color="Color.Secondary" Style="margin-bottom: 0;" />
+                                    </div>
+                                    <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                                        <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                                    </div>
+                                </div>
+                                <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                                    <img style="width: 30px; height: 30px;" src="trash.png" />
+                                </div>
+                                <hr />
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <div style="background-color: #A79FEF;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <div>
+                                            <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;"><del>@item.Title</del></span>
+                                        </div>
+                                        <div style="margin-right: 12px; margin-top: 12px;">
+                                            <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                                        </div>
+                                    </div>
+                                    <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                                        <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                                    </div>
+                                </div>
+                                <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                                    <img style="width: 30px; height: 30px;" src="trash.png" />
+                                </div>
+                                <hr />
+                            </li>
+                        }
+                    }
+                </Virtualize>
+            </ul>
+        </MudTabPanel>
+        <MudTabPanel Text="Completed Tasks">
+            <ul>
+                <Virtualize Items="Items" Context="item">
+                    @if (!item.Completed)
+                    {
+                        <li>
+                            <div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                    </div>
+                                    <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
+                                    <div style="margin-right: 12px; margin-top: 12px;">
+                                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch DisableRipple="true" @bind-Checked="item.Important" Color="Color.Secondary" Style="margin-bottom: 0;" />
+                                </div>
+                                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                                </div>
+                            </div>
+                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                                <img style="width: 30px; height: 30px;" src="trash.png" />
+                            </div>
+                            <hr />
+                        </li>
+                    }
+                </Virtualize>
+            </ul>
+        </MudTabPanel>
+        <MudTabPanel Text="Important Tasks">
+            <ul>
+                <Virtualize Items="Items" Context="item">
+                    @if (!item.Completed && item.Important)
+                    {
+                        <li>
+                            <div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
+                                    </div>
+                                    <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
+                                    <div style="margin-right: 12px; margin-top: 12px;">
+                                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch DisableRipple="true" @bind-Checked="item.Important" Color="Color.Secondary" Style="margin-bottom: 0;" />
+                                </div>
+                                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                                </div>
+                            </div>
+                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                                <img style="width: 30px; height: 30px;" src="trash.png" />
+                            </div>
+                            <hr />
+                        </li>
+                    }
+                </Virtualize>
+            </ul>
+        </MudTabPanel>
+        <MudTabPanel Text="Completed Tasks">
+            <ul>
+                <Virtualize Items="Items" Context="item">
+                    @if (item.Completed)
+                    {
+                        <li>
+                            <div style="background-color: #A79FEF;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;"><del>@item.Title</del></span>
+                                    </div>
+                                    <div style="margin-right: 12px; margin-top: 12px;">
+                                        <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
+                                    </div>
+                                </div>
+                                <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
+                                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
+                                </div>
+                            </div>
+                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
+                                <img style="width: 30px; height: 30px;" src="trash.png" />
+                            </div>
+                            <hr />
+                        </li>
+                    }
+                </Virtualize>
+            </ul>
+        </MudTabPanel>
+    </MudTabs>
+    
+}
+else
+{
+    <h1>You cannot access this List</h1>
+}
+
+
+@code {
+    [Parameter]
+    public string listid { get; set; }
+    [Parameter]
+    public string listname { get; set; }
+    DateTime? NewDate;
+    TimeSpan? NewTime;
+    bool Authorized = false;
+    bool NewImportant = false;
+    string NewTitle = string.Empty;
+    string NewContent = string.Empty;
+    string ContentHeight = "0";
+    string ImportantDisplay = "block";
+    string UncompletedDisplay = "block";
+    string CompletedDisplay = "none";
+    HashSet<ToDoItem> Items = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (sessionsService.session.logged)
+        {
+            var res = await listsService.GetItemsAsync(sessionsService.session.username, listid);
+            if (res.success)
+            {
+                Authorized = true;
+                Items = res.items;
+            }
+        }
+    }
+
+    private async Task SaveListAsync()
+    {
+        Parallel.ForEach(Items, item =>
+        {
+            item.DeleteHeight = "0";
+            item.ContentHeight = "0";
+        });
+        var NewList = new ToDoList() { ListId = listid, Items = Items, Owners = stateService.Owners };
+        await listsService.UpdateListAsync(sessionsService.session.username, NewList);
+    }
+
+    private void ShowNewContent()
+    {
+        if (ContentHeight == "0")
+        {
+            ContentHeight = "100px";
+        }
+        else
+        {
+            ContentHeight = "0";
+        }
+    }
+
+    private void ShowImportantTasks()
+    {
+        if (ImportantDisplay == "none")
+        {
+            ImportantDisplay = "block";
+        }
+        else
+        {
+            ImportantDisplay = "none";
+        }
+    }
+
+    private void ShowUncompletedTasks()
+    {
+        if (UncompletedDisplay == "none")
+        {
+            UncompletedDisplay = "block";
+        }
+        else
+        {
+            UncompletedDisplay = "none";
+        }
+    }
+
+    private void ShowCompletedTasks()
+    {
+        if (CompletedDisplay == "none")
+        {
+            CompletedDisplay = "block";
+        }
+        else
+        {
+            CompletedDisplay = "none";
+        }
+    }
+
+    private void ResetFields()
+    {
+        NewImportant = false;
+        NewTitle = string.Empty;
+        NewContent = string.Empty;
+        ContentHeight = "0";
+    }
+
+    private async Task AddNewItem()
+    {
+        if (string.IsNullOrWhiteSpace(NewTitle) || NewDate is null || NewTime is null)
+        {
+            return;
+        }
+        var NewRemindTime = NewDate.Value.Add(NewTime.Value);
+        NewTitle = NewTitle.Trim();
+        if (NewTitle.Length > 35)
+        {
+            await JsRuntime.InvokeAsync<object>("alert", "Your title is too long");
+            return;
+        }
+        ToDoItem NewItem = new() { Content = NewContent, Title = NewTitle, TimeCreate = DateTime.Now, ListId = listid, Important = NewImportant, TimeRemind = NewRemindTime };
+        Items.Add(NewItem);
+        ResetFields();
+    }
+
+    private void DeleteItem(ToDoItem item)
+    {
+        Items.Remove(item);
+    }
+
+    private void ShowMore(ToDoItem item)
+    {
+        if (item.DeleteHeight == "0")
+        {
+            item.ContentHeight = "100px";
+            item.DeleteHeight = "30px";
+        }
+        else
+        {
+            item.ContentHeight = "0";
+            item.DeleteHeight = "0";
+        }
+    }
+}
+

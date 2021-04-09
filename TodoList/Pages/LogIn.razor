@@ -1,0 +1,146 @@
+﻿@page "/log"
+@page "/log/{register:bool}"
+@using TodoList.Models;
+@inject SessionsService sessionsService
+@inject StateService stateService
+@inject AccountsService accountService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager navigationManager
+
+@if (!sessionsService.session.logged)
+{
+    if (!register)
+    {
+        <div class="wrapper">
+            <MudPaper Elevation="3" Style="text-align:center; padding: 20px 40px;">
+                <div class="form">
+                    <h4>Sign In</h4>
+                    <MudTextField @bind-Value="@username" Label="Username" Required="true"></MudTextField><br />
+                    <MudTextField @bind-Value="@password" Label="Password" InputType="InputType.Password" Required="true"></MudTextField><br />
+                    <p>Don't have an account yet? <a style="color: #0366d6;" @onclick="() => { username = string.Empty; password = string.Empty; }" href="log/true">Register</a></p>
+                    <MudButton Color="Color.Primary" @onclick="SignInAsync">Log In</MudButton>
+                </div>
+                @if (loading)
+                {
+                    <div style="margin-top: 5px;">
+                        <span style="text-align:left;"><MudProgressCircular Color="Color.Primary" Indeterminate="true" Style="padding-top: 5px;" /></span> Signing you in...
+                    </div>
+                }
+            </MudPaper>
+        </div>
+    }
+    else
+    {
+        <div class="wrapper">
+            <MudPaper Elevation="3" Style="text-align:center; padding: 20px 40px;">
+                <div class="form">
+                    <h4>Sign In</h4>
+                    <MudTextField @bind-Value="@username" Label="Username" Required="true"></MudTextField><br />
+                    <MudTextField @bind-Value="@password" Label="Password" InputType="InputType.Password" Required="true"></MudTextField><br />
+                    <MudTextField @bind-Value="@passwordConfirm" Label="Confirm Password" InputType="InputType.Password" Required="true"></MudTextField><br />
+                    <MudButton Color="Color.Primary" @onclick="SignUpAsync">Sign Up</MudButton>
+                </div>
+                @if (loading)
+                {
+                    <div style="margin-top: 5px;">
+                        <span style="text-align:left;"><MudProgressCircular Color="Color.Primary" Indeterminate="true" Style="padding-top: 5px;" /></span> Signing you up...
+                    </div>
+                }
+            </MudPaper>
+        </div>
+    }
+}
+else
+{
+    <div class="wrapper">
+        <MudPaper Elevation="3" Style="text-align:center; padding: 20px 40px;">
+            <h4>You have already logged in as @sessionsService.session.username</h4>
+            <MudButton Color="Color.Primary" @onclick="SignOut">Log Out</MudButton><br />
+            @if (loading)
+            {
+                <div style="margin-top: 5px;">
+                    <span style="text-align:left;"><MudProgressCircular Color="Color.Primary" Indeterminate="true" Style="padding-top: 5px;" /></span> Logging Out...
+                </div>
+            }
+        </MudPaper>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public bool register { get; set; } = false;
+    private bool loading = false;
+    private string username;
+    private string password;
+    private string passwordConfirm;
+
+    private async Task SignInAsync()
+    {
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            await JsRuntime.InvokeAsync<object>("alert", "Please fill in your username");
+            return;
+        }
+        if (password.Length < 8)
+        {
+            await JsRuntime.InvokeAsync<object>("alert", "Your password must contain at least 8 characters");
+            return;
+        }
+        loading = true;
+        var acc = new Account() { username = username, password = password };
+        var res = accountService.SignIn(acc);
+        loading = false;
+        if (res.success)
+        {
+            sessionsService.session.username = username;
+            sessionsService.session.logged = true;
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            await JsRuntime.InvokeAsync<object>("alert", res.err);
+        }
+
+    }
+
+    private async Task SignUpAsync()
+    {
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            await JsRuntime.InvokeAsync<object>("alert", "Please fill in your username");
+            return;
+        }
+        if (password.Length < 8)
+        {
+            await JsRuntime.InvokeAsync<object>("alert", "Your password must contain at least 8 characters");
+            return;
+        }
+        if (passwordConfirm != password)
+        {
+            await JsRuntime.InvokeAsync<object>("alert", "Your have to correctly confirm your password");
+            return;
+        }
+        loading = true;
+        var acc = new Account() { username = username, password = password };
+        var res = accountService.SignUp(acc);
+        loading = false;
+        if (res.success)
+        {
+            sessionsService.session.username = username;
+            sessionsService.session.logged = true;
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            await JsRuntime.InvokeAsync<object>("alert", res.err);
+        }
+    }
+
+    private void SignOut()
+    {
+        sessionsService.SignOut();
+        stateService.Owners = new();
+        navigationManager.NavigateTo("/");
+    }
+}

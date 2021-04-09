@@ -9,7 +9,7 @@ namespace TodoList.Models
     public class Session
     {
         [Key]
-        public int Id { get; set; } = 0;
+        public int Id { get; set; }
         public bool logged { get; set; } = false;
         public string username { get; set; } = string.Empty;
     }

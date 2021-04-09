@@ -2,36 +2,19 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoList.Data;
 
 namespace TodoList.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20210406094047_.")]
-    partial class _
+    partial class TodoDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.4");
-
-            modelBuilder.Entity("AccountToDoList", b =>
-                {
-                    b.Property<string>("Ownersusername")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("listsListId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Ownersusername", "listsListId");
-
-                    b.HasIndex("listsListId");
-
-                    b.ToTable("AccountToDoList");
-                });
 
             modelBuilder.Entity("TodoList.Models.Account", b =>
                 {
@@ -74,6 +57,12 @@ namespace TodoList.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ContentHeight")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeleteHeight")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Important")
                         .HasColumnType("INTEGER");
 
@@ -81,6 +70,9 @@ namespace TodoList.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("TimeCreate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("TimeRemind")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
@@ -101,6 +93,12 @@ namespace TodoList.Migrations
                     b.Property<string>("ListId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Accountusername")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeleteHeight")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
@@ -109,22 +107,31 @@ namespace TodoList.Migrations
 
                     b.HasKey("ListId");
 
+                    b.HasIndex("Accountusername");
+
                     b.ToTable("Lists");
                 });
 
-            modelBuilder.Entity("AccountToDoList", b =>
+            modelBuilder.Entity("TodoList.Models.Username", b =>
                 {
-                    b.HasOne("TodoList.Models.Account", null)
-                        .WithMany()
-                        .HasForeignKey("Ownersusername")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.HasOne("TodoList.Models.ToDoList", null)
-                        .WithMany()
-                        .HasForeignKey("listsListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<string>("ListId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ToDoListListId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("username")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ToDoListListId");
+
+                    b.ToTable("Username");
                 });
 
             modelBuilder.Entity("TodoList.Models.ToDoItem", b =>
@@ -136,7 +143,28 @@ namespace TodoList.Migrations
 
             modelBuilder.Entity("TodoList.Models.ToDoList", b =>
                 {
+                    b.HasOne("TodoList.Models.Account", null)
+                        .WithMany("lists")
+                        .HasForeignKey("Accountusername");
+                });
+
+            modelBuilder.Entity("TodoList.Models.Username", b =>
+                {
+                    b.HasOne("TodoList.Models.ToDoList", null)
+                        .WithMany("Owners")
+                        .HasForeignKey("ToDoListListId");
+                });
+
+            modelBuilder.Entity("TodoList.Models.Account", b =>
+                {
+                    b.Navigation("lists");
+                });
+
+            modelBuilder.Entity("TodoList.Models.ToDoList", b =>
+                {
                     b.Navigation("Items");
+
+                    b.Navigation("Owners");
                 });
 #pragma warning restore 612, 618
         }

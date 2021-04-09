@@ -6,11 +6,11 @@ namespace TodoList.Services
     public class SessionsService
     {
         private TodoDbContext dbContext;
-        private Session session;
+        public Session session;
         public SessionsService(TodoDbContext context)
         {
             dbContext = context;
-            session = dbContext.Sessions.Find(0);
+            session = dbContext.Sessions.Find(1);
             if (session is null)
             {
                 session = new();

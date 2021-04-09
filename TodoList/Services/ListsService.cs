@@ -12,7 +12,7 @@ namespace TodoList.Services
             dbContext = context;
         }
 
-        public ListResult GetListName(string username)
+        public ListResult GetLists(string username)
         {
             var myacc = dbContext.Accounts.Find(username);
             if (myacc is null)
@@ -22,14 +22,14 @@ namespace TodoList.Services
             return new() { success = true, lists = myacc.lists };
         }
 
-        public ListResult GetItems(string username, string listid)
+        public async Task<ListResult> GetItemsAsync(string username, string listid)
         {
-            var res = dbContext.Lists.Find(listid);
+            var res = await dbContext.Lists.FindAsync(listid);
             if (res is null)
             {
                 return new() { success = false, err = "List not found" };
             }
-            if (res.Owners.Contains(new() { username = username })) 
+            if (res.Owners.Contains(new(username))) 
             {
                 return new() { success = true, items = res.Items };
             }
@@ -42,42 +42,49 @@ namespace TodoList.Services
             return (acc is not null);
         }
 
-        public async Task CreateNewList(string username, ToDoList list)
+        public async Task CreateNewListAsync(string username, ToDoList list)
         {
             var task = dbContext.Lists.AddAsync(list);
             var myacc = dbContext.Accounts.Find(username);
             myacc.lists.Add(list);
-            dbContext.Accounts.Update(myacc);
             await task;
+            dbContext.Accounts.Update(myacc);
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<ListResult> UpdateList(string username, ToDoList list)
+        public async Task<ListResult> UpdateListAsync(string username, ToDoList list)
         {
             var oldlist = dbContext.Lists.Find(list.ListId);
             if (oldlist is null)
             {
                 return new() { success = false, err = "List not found" };
             }
-            if (oldlist.Owners.Contains(new() { username = username })) 
+            if (oldlist.Owners.Contains(new(username))) 
             {
-                dbContext.Lists.Update(list);
+                oldlist.Items = list.Items;
+                oldlist.TimeCreate = list.TimeCreate;
+                oldlist.Owners = list.Owners;
+                dbContext.Lists.Update(oldlist);
                 await dbContext.SaveChangesAsync();
                 return new() { success = true };
             }
             return new() { success = false, err = "You cannot access or modify this list" };
         }
 
-        public async Task<ListResult> DeleteList(string username, string listid)
+        public async Task<ListResult> DeleteListAsync(string username, string listid)
         {
             var list = dbContext.Lists.Find(listid);
             if (list is null)
             {
                 return new() { success = false, err = "List not found" };
             }
-            if (list.Owners.Contains(new() { username = username}))
+            if (list.Owners.Contains(new(username)))
             {
-                dbContext.Lists.Remove(new() { ListId = listid });
+                var task = dbContext.Accounts.FindAsync(username);
+                dbContext.Lists.Remove(list);
+                var acc = await task;
+                acc.lists.Remove(list);
+                dbContext.Accounts.Update(acc);
                 await dbContext.SaveChangesAsync();
                 return new() { success = true };
             }
