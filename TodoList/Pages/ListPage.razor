@@ -376,9 +376,10 @@ else
         ResetFields();
     }
 
-    private void DeleteItem(ToDoItem item)
+    private async Task DeleteItem(ToDoItem item)
     {
         Items.Remove(item);
+        await listsService.DeleteItemAsync(item);
     }
 
     private void ShowMore(ToDoItem item)

@@ -92,5 +92,10 @@ namespace TodoList.Services
             }
             return new() { success = false, err = "You cannot access or modify this list" };
         }
+
+        public async Task DeleteItemAsync(ToDoItem item)
+        {
+            await Task.Run(() => dbContext.Items.Remove(item));
+        }
     }
 }

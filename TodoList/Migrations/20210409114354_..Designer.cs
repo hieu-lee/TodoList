@@ -9,7 +9,7 @@ using TodoList.Data;
 namespace TodoList.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20210409071423_.")]
+    [Migration("20210409114354_.")]
     partial class _
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
