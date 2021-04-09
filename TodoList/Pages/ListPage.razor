@@ -13,17 +13,20 @@
     </div>
     <div>
         <div style="display: flex; justify-content: space-between;">
-            <div style="display: flex;">
-                <img @onclick="AddNewItem" style="width: 30px; height: 30px; margin-left: 12px; margin-top: 10px; cursor: pointer;" src="add.png" />
-                <MudTextField T="string" FullWidth="true" Placeholder="Title" @bind-Value="@NewTitle" Style="margin: 0 10px;"></MudTextField>
-
+            <div>
+                <div style="display: flex;">
+                    <img @onclick="AddNewItem" style="width: 30px; height: 30px; margin-left: 12px; margin-top: 10px; cursor: pointer;" src="add.png" />
+                    <MudTextField T="string" FullWidth="true" Placeholder="Title" @bind-Value="@NewTitle" Style="margin: 0 10px;"></MudTextField>
+                </div>
+                <div style="display: flex;">
+                    <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
+                        <MudDatePicker Label="Work Date" @bind-Date="NewDate" DateFormat="dd/MM/yyyy" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
+                        <MudTimePicker Label="Work Time" @bind-Time="NewTime" />
+                    </MudItem>
+                </div>
             </div>
-            <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
-                <MudDatePicker Label="Work Date" @bind-Date="NewDate" DateFormat="dd/MM/yyyy" />
-            </MudItem>
-            <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
-                <MudTimePicker Label="Work Time" @bind-Time="NewTime" />
-            </MudItem>
             <div style="margin-right: 12px; margin-top: 12px;">
                 <img @onclick="ShowNewContent" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
             </div>
@@ -49,7 +52,7 @@
                                         <div>
                                             <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
                                         </div>
-                                        <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
+                                        <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                     </div>
                                     <div style="margin-right: 12px; margin-top: 12px;">
                                         <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
@@ -106,8 +109,8 @@
                                         <div>
                                             <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
                                         </div>
-                                        <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
-                                        <div style="margin-right: 12px; margin-top: 12px;">
+                                        <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
+                                        <div style="margin-right: 20px; margin-top: 12px;">
                                             <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
                                         </div>
                                     </div>
@@ -161,7 +164,7 @@
                                     <div>
                                         <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
                                     </div>
-                                    <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
+                                    <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                     <div style="margin-right: 12px; margin-top: 12px;">
                                         <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
                                     </div>
@@ -193,7 +196,7 @@
                                     <div>
                                         <MudCheckBox DisableRipple="true" @bind-Checked="@item.Completed" Color="Color.Primary"></MudCheckBox><span style="margin: 0 5px;">@item.Title</span>
                                     </div>
-                                    <small style="margin-left: 12px;">Time: @item.TimeRemind.ToString()</small>
+                                    <small style="margin-left: 15px;">Time: @item.TimeRemind.ToString()</small>
                                     <div style="margin-right: 12px; margin-top: 12px;">
                                         <img @onclick="() => { ShowMore(item); }" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
                                     </div>

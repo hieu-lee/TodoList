@@ -17,4 +17,10 @@
     <Folder Include="Components\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="todolist.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
