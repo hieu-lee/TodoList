@@ -9,7 +9,7 @@ namespace TodoList.Models
         public string ItemId { get; set; } = Guid.NewGuid().ToString();
         public string ListId { get; set; }
         public DateTime TimeCreate { get; set; }
-        public DateTime TimeRemind { get; set; }
+        public DateTime? TimeRemind { get; set; }
         public bool Important { get; set; } = false;
         public bool Completed { get; set; } = false;
         public string Content { get; set; } = string.Empty;

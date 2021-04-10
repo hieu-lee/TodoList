@@ -61,7 +61,7 @@ namespace TodoList.Migrations
                     ItemId = table.Column<string>(type: "TEXT", nullable: false),
                     ListId = table.Column<string>(type: "TEXT", nullable: true),
                     TimeCreate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    TimeRemind = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TimeRemind = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Important = table.Column<bool>(type: "INTEGER", nullable: false),
                     Completed = table.Column<bool>(type: "INTEGER", nullable: false),
                     Content = table.Column<string>(type: "TEXT", nullable: true),

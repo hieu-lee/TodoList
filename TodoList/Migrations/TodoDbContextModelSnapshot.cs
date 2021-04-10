@@ -72,7 +72,7 @@ namespace TodoList.Migrations
                     b.Property<DateTime>("TimeCreate")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("TimeRemind")
+                    b.Property<DateTime?>("TimeRemind")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")

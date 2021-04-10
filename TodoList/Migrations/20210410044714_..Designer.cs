@@ -9,7 +9,7 @@ using TodoList.Data;
 namespace TodoList.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20210409114354_.")]
+    [Migration("20210410044714_.")]
     partial class _
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,7 +74,7 @@ namespace TodoList.Migrations
                     b.Property<DateTime>("TimeCreate")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("TimeRemind")
+                    b.Property<DateTime?>("TimeRemind")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
