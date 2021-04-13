@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TodoList.Data;
 using TodoList.Models;
@@ -20,7 +22,12 @@ namespace TodoList.Services
             {
                 return new() { success = false, err = "Username not found" };
             }
-            var lists = dbContext.Lists.Where(s => s.Owner == myacc).ToList();
+            var listsArray = dbContext.Lists.Where(s => s.Owner == myacc).ToArray();
+            SortedSet<ToDoList> lists = new();
+            foreach (var list in listsArray)
+            {
+                lists.Add(list);
+            }
             return new() { success = true, lists = lists };
         }
 

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TodoList.Models
 {
-    public class ToDoList
+    public class ToDoList : IComparable<ToDoList>
     {
         [Key]
         public string ListId { get; set; } = Guid.NewGuid().ToString();
@@ -13,6 +13,16 @@ namespace TodoList.Models
         public Account Owner { get; set; }
         public HashSet<ToDoItem> Items { get; set; } = new();
         public string DeleteHeight { get; set; } = "0";
+
+        public int CompareTo(ToDoList other)
+        {
+            var a = -TimeCreate.CompareTo(other.TimeCreate);
+            if (a != 0)
+            {
+                return a;
+            }
+            return ListId.CompareTo(other.ListId);
+        }
 
         public override bool Equals(object obj)
         {
