@@ -15,7 +15,7 @@
 </div>
 <hr />
 <ul>
-    @foreach (var list in MyLists)
+    @foreach (var list in MySortedLists.Values)
     {
         <li>
             <div style="display: flex; justify-content: space-between">
@@ -42,11 +42,12 @@
 
 
 @code {
-        string NewName = string.Empty;
-        string username;
-        HashSet<ToDoList> MyLists = new();
+    string NewName = string.Empty;
+    string username;
+    SortedList<Tuple<DateTime, string>, ToDoList> MySortedLists = new(new DescendingComparer<Tuple<DateTime, string>>());
 
-        protected override async Task OnInitializedAsync()
+
+    protected override async Task OnInitializedAsync()
     {
         if (sessionsService.session.logged)
         {
@@ -54,7 +55,10 @@
             var res = listsService.GetLists(username);
             if (res.success)
             {
-                MyLists = res.lists;
+                foreach (var list in res.lists)
+                {
+                    MySortedLists.Add(new(list.TimeCreate, list.ListId), list);
+                }
                 return;
             }
             else
@@ -74,7 +78,7 @@
         }
         NewName = NewName.Trim();
         ToDoList NewList = new() { Owner = new() { username = sessionsService.session.username }, Name = NewName };
-        MyLists.Add(NewList);
+        MySortedLists.Add(new(NewList.TimeCreate, NewList.ListId), NewList);
         await listsService.CreateNewListAsync(sessionsService.session.username, NewList);
         NewName = string.Empty;
     }
@@ -98,7 +102,20 @@
 
     private async Task DeleteListAsync(ToDoList list)
     {
-        MyLists.Remove(list);
+        MySortedLists.Remove(new(list.TimeCreate, list.ListId));
         await listsService.DeleteListAsync(username, list.ListId);
+    }
+
+    partial class DescendingComparer<TKey> : IComparer<Tuple<DateTime, string>>
+    {
+        public int Compare(Tuple<DateTime, string> x, Tuple<DateTime, string> y)
+        {
+            var a = y.Item1.CompareTo(x.Item1);
+            if (a != 0)
+            {
+                return a;
+            }
+            return x.Item2.CompareTo(y.Item2);
+        }
     }
 }

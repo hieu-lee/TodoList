@@ -9,7 +9,7 @@ namespace TodoList.Models
     {
         public bool success { get; set; }
         public string err { get; set; }
-        public HashSet<ToDoList> lists { get; set; }
+        public List<ToDoList> lists { get; set; }
         public HashSet<ToDoItem> items { get; set; }
     }
 }

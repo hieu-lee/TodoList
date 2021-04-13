@@ -20,7 +20,7 @@ namespace TodoList.Services
             {
                 return new() { success = false, err = "Username not found" };
             }
-            var lists = dbContext.Lists.Where(s => s.Owner == myacc).ToHashSet();
+            var lists = dbContext.Lists.Where(s => s.Owner == myacc).ToList();
             return new() { success = true, lists = lists };
         }
 
