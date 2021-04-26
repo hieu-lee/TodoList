@@ -59,7 +59,7 @@ namespace TodoList.Migrations
                 columns: table => new
                 {
                     ItemId = table.Column<string>(type: "TEXT", nullable: false),
-                    ListId = table.Column<string>(type: "TEXT", nullable: true),
+                    ParentListListId = table.Column<string>(type: "TEXT", nullable: true),
                     TimeCreate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     TimeRemind = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Important = table.Column<bool>(type: "INTEGER", nullable: false),
@@ -68,23 +68,23 @@ namespace TodoList.Migrations
                     Title = table.Column<string>(type: "TEXT", nullable: true),
                     ContentHeight = table.Column<string>(type: "TEXT", nullable: true),
                     DeleteHeight = table.Column<string>(type: "TEXT", nullable: true),
-                    ToDoListListId = table.Column<string>(type: "TEXT", nullable: true)
+                    LastNotified = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Items", x => x.ItemId);
                     table.ForeignKey(
-                        name: "FK_Items_Lists_ToDoListListId",
-                        column: x => x.ToDoListListId,
+                        name: "FK_Items_Lists_ParentListListId",
+                        column: x => x.ParentListListId,
                         principalTable: "Lists",
                         principalColumn: "ListId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Items_ToDoListListId",
+                name: "IX_Items_ParentListListId",
                 table: "Items",
-                column: "ToDoListListId");
+                column: "ParentListListId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lists_Ownerusername",

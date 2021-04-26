@@ -1,7 +1,8 @@
 ﻿@page "/"
 @using TodoList.Models;
-@inject SessionsService sessionsService
 @inject ListsService listsService
+@inject SessionsService sessionsService
+@inject NotificationService notificationService
 @inject NavigationManager navigationManager
 
 <h1 style="text-align: center;">Welcome @sessionsService.session.username to Todo List</h1>
@@ -51,7 +52,7 @@
         if (sessionsService.session.logged)
         {
             username = sessionsService.session.username;
-            var res = listsService.GetLists(username);
+            var res = await listsService.GetListsAsync(username);
             if (res.success)
             {
                 MySortedLists = res.lists;

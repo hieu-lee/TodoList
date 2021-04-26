@@ -5,7 +5,7 @@ namespace TodoList.Services
 {
     public class SessionsService
     {
-        private TodoDbContext dbContext;
+        private readonly TodoDbContext dbContext;
         public Session session;
         public SessionsService(TodoDbContext context)
         {

@@ -1,6 +1,7 @@
 ﻿@page "/list/{listid}/{listname}"
 @inject SessionsService sessionsService
 @inject ListsService listsService
+@inject NotificationService notificationService 
 @inject IJSRuntime JsRuntime
 @using TodoList.Models
 
@@ -288,21 +289,21 @@ else
 
 
 @code {
-    [Parameter]
-    public string listid { get; set; }
-    [Parameter]
-    public string listname { get; set; }
-    DateTime? NewDate;
-    TimeSpan? NewTime;
-    bool Authorized = false;
-    bool NewImportant = false;
-    string NewTitle = string.Empty;
-    string NewContent = string.Empty;
-    string ContentHeight = "0";
-    string ImportantDisplay = "block";
-    string UncompletedDisplay = "block";
-    string CompletedDisplay = "none";
-    HashSet<ToDoItem> Items = new();
+        [Parameter]
+        public string listid { get; set; }
+        [Parameter]
+        public string listname { get; set; }
+        DateTime? NewDate;
+        TimeSpan? NewTime;
+        bool Authorized = false;
+        bool NewImportant = false;
+        string NewTitle = string.Empty;
+        string NewContent = string.Empty;
+        string ContentHeight = "0";
+        string ImportantDisplay = "block";
+        string UncompletedDisplay = "block";
+        string CompletedDisplay = "none";
+        HashSet<ToDoItem> Items = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -325,7 +326,10 @@ else
             item.ContentHeight = "0";
         });
         var NewList = new ToDoList() { ListId = listid, Items = Items, Owner = new() { username = sessionsService.session.username } };
+
+        var task = Task.Factory.StartNew(() => { notificationService.AddNewItems(Items); });
         await listsService.UpdateListAsync(sessionsService.session.username, NewList);
+        await task;
     }
 
     private void ShowNewContent()
@@ -403,7 +407,7 @@ else
             await JsRuntime.InvokeAsync<object>("alert", "Your title is too long");
             return;
         }
-        ToDoItem NewItem = new() { Content = NewContent, Title = NewTitle, TimeCreate = DateTime.Now, ListId = listid, Important = NewImportant, TimeRemind = NewRemindTime };
+        ToDoItem NewItem = new() { Content = NewContent, Title = NewTitle, TimeCreate = DateTime.Now, Important = NewImportant, TimeRemind = NewRemindTime };
         Items.Add(NewItem);
         ResetFields();
     }
@@ -411,6 +415,7 @@ else
     private async Task DeleteItem(ToDoItem item)
     {
         Items.Remove(item);
+        notificationService.DeleteItem(item);
         await listsService.DeleteItemAsync(item);
     }
 

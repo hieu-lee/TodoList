@@ -5,6 +5,7 @@
 @inject AccountsService accountService
 @inject IJSRuntime JsRuntime
 @inject NavigationManager navigationManager
+@inject NotificationService notificationService
 
 @if (!sessionsService.session.logged)
 {
@@ -92,8 +93,7 @@ else
         loading = false;
         if (res.success)
         {
-            sessionsService.session.username = username;
-            sessionsService.session.logged = true;
+            notificationService.StartNotification();
             navigationManager.NavigateTo("/");
         }
         else
@@ -126,8 +126,7 @@ else
         loading = false;
         if (res.success)
         {
-            sessionsService.session.username = username;
-            sessionsService.session.logged = true;
+            notificationService.StartNotification();
             navigationManager.NavigateTo("/");
         }
         else
@@ -139,6 +138,7 @@ else
     private void SignOut()
     {
         sessionsService.SignOut();
+        notificationService.StopNotification();
         navigationManager.NavigateTo("/");
     }
 }

@@ -7,7 +7,7 @@ namespace TodoList.Models
     {
         [Key]
         public string ItemId { get; set; } = Guid.NewGuid().ToString();
-        public string ListId { get; set; }
+        public ToDoList ParentList { get; set; }
         public DateTime TimeCreate { get; set; }
         public DateTime? TimeRemind { get; set; }
         public bool Important { get; set; } = false;
@@ -16,6 +16,7 @@ namespace TodoList.Models
         public string Title { get; set; }
         public string ContentHeight { get; set; } = "0";
         public string DeleteHeight { get; set; } = "0";
+        public DateTime? LastNotified { get; set; }
 
         public override bool Equals(object obj)
         {

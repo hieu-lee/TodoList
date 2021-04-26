@@ -8,7 +8,7 @@ namespace TodoList.Services
 {
     public class AccountsService
     {
-        private TodoDbContext dbContext;
+        private readonly TodoDbContext dbContext;
         private EncryptionAndCompressService encryptionService;
         private SessionsService sessionsService;
         public AccountsService(TodoDbContext context, EncryptionAndCompressService encrypt, SessionsService sessionsService)

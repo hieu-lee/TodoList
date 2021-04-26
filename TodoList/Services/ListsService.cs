@@ -9,15 +9,15 @@ namespace TodoList.Services
 {
     public class ListsService
     {
-        private TodoDbContext dbContext;
+        private readonly TodoDbContext dbContext;
         public ListsService(TodoDbContext context)
         {
             dbContext = context;
         }
 
-        public ListResult GetLists(string username)
+        public async Task<ListResult> GetListsAsync(string username)
         {
-            var myacc = dbContext.Accounts.Find(username);
+            var myacc = await dbContext.Accounts.FindAsync(username);
             if (myacc is null)
             {
                 return new() { success = false, err = "Username not found" };
@@ -40,7 +40,7 @@ namespace TodoList.Services
             }
             if (res.Owner.username == username) 
             {
-                var items = dbContext.Items.Where(s => s.ListId == listid).ToHashSet();
+                var items = dbContext.Items.Where(s => s.ParentList.ListId == listid).ToHashSet();
                 return new() { success = true, items = items };
             }
             return new() { success = false, err = "You cannot access or modify this list" };
@@ -71,6 +71,10 @@ namespace TodoList.Services
             }
             if (oldlist.Owner.username == username) 
             {
+                Parallel.ForEach(list.Items, item =>
+                {
+                    item.ParentList = oldlist;
+                });
                 oldlist.Items = list.Items;
                 oldlist.TimeCreate = list.TimeCreate;
                 dbContext.Lists.Update(oldlist);
@@ -89,6 +93,7 @@ namespace TodoList.Services
             }
             if (list.Owner.username == username)
             {
+                dbContext.Items.RemoveRange(list.Items);
                 var task = dbContext.Accounts.FindAsync(username);
                 dbContext.Lists.Remove(list);
                 var acc = await task;

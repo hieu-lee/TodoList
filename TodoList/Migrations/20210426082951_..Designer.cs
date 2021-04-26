@@ -9,7 +9,7 @@ using TodoList.Data;
 namespace TodoList.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20210410044714_.")]
+    [Migration("20210426082951_.")]
     partial class _
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,7 +68,10 @@ namespace TodoList.Migrations
                     b.Property<bool>("Important")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ListId")
+                    b.Property<DateTime?>("LastNotified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ParentListListId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("TimeCreate")
@@ -80,12 +83,9 @@ namespace TodoList.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ToDoListListId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("ItemId");
 
-                    b.HasIndex("ToDoListListId");
+                    b.HasIndex("ParentListListId");
 
                     b.ToTable("Items");
                 });
@@ -116,9 +116,11 @@ namespace TodoList.Migrations
 
             modelBuilder.Entity("TodoList.Models.ToDoItem", b =>
                 {
-                    b.HasOne("TodoList.Models.ToDoList", null)
+                    b.HasOne("TodoList.Models.ToDoList", "ParentList")
                         .WithMany("Items")
-                        .HasForeignKey("ToDoListListId");
+                        .HasForeignKey("ParentListListId");
+
+                    b.Navigation("ParentList");
                 });
 
             modelBuilder.Entity("TodoList.Models.ToDoList", b =>
