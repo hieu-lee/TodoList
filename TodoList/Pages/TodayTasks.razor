@@ -1,42 +1,12 @@
-﻿@page "/list/{listid}/{listname}"
+﻿@page "/today"
 @inject SessionsService sessionsService
 @inject ListsService listsService
-@inject NotificationService notificationService 
-@inject IJSRuntime JsRuntime
 @using TodoList.Models
-
 @if (Authorized)
 {
-    <h1 style="text-align: center;">@listname</h1>
+    <h1 style="text-align: center;">Today Task</h1>
     <div style="display: flex; justify-content:center;">
         <MudButton OnClick="SaveListAsync" Variant="Variant.Filled" Color="Color.Primary">Save List</MudButton>
-    </div>
-    <div>
-        <div style="display: flex; justify-content: space-between;">
-            <div>
-                <div style="display: flex;">
-                    <img @onclick="AddNewItem" style="width: 30px; height: 30px; margin-left: 12px; margin-top: 10px; cursor: pointer;" src="add.png" />
-                    <MudTextField T="string" FullWidth="true" Placeholder="Title" @bind-Value="@NewTitle" Style="margin: 0 10px;"></MudTextField>
-                </div>
-                <div style="display: flex;">
-                    <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
-                        <MudDatePicker Label="Work Date" @bind-Date="NewDate" DateFormat="dd/MM/yyyy" />
-                    </MudItem>
-                    <MudItem xs="12" sm="6" md="4" Style="margin-left: 15px;">
-                        <MudTimePicker Label="Work Time" @bind-Time="NewTime" />
-                    </MudItem>
-                </div>
-            </div>
-            <div style="margin-right: 12px; margin-top: 12px;">
-                <img @onclick="ShowNewContent" src="more.png" style="width: 30px; height: 30px; cursor: pointer;" />
-            </div>
-        </div>
-        <div>
-            <span style="margin-right: 10px; margin-left: 15px;">Important</span><MudSwitch @bind-Checked="@NewImportant" Color="Color.Secondary" Style="margin-bottom: 0;" />
-        </div>
-        <div style="height: @ContentHeight; overflow-y: hidden; transition: height 0.5s;">
-            <MudTextField Placeholder="Content" T="string" Variant="Variant.Outlined" @bind-Value="@NewContent" Lines="3" FullWidth="true" />
-        </div>
     </div>
     <hr />
     <MudTabs Elevation="3" Rounded="true" Centered="true" ApplyEffectsToContainer="true">
@@ -72,9 +42,6 @@
                                     <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
                                 </div>
                             </div>
-                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
-                                <img style="width: 30px; height: 30px;" src="trash.png" />
-                            </div>
                             <hr />
                         </li>
                     }
@@ -93,9 +60,6 @@
                                 <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
                                     <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
                                 </div>
-                            </div>
-                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
-                                <img style="width: 30px; height: 30px;" src="trash.png" />
                             </div>
                             <hr />
                         </li>
@@ -137,9 +101,6 @@
                                         <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
                                     </div>
                                 </div>
-                                <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
-                                    <img style="width: 30px; height: 30px;" src="trash.png" />
-                                </div>
                                 <hr />
                             </li>
                         }
@@ -158,9 +119,6 @@
                                     <div style="height: @item.ContentHeight; overflow-y: hidden; transition: height 0.5s;">
                                         <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
                                     </div>
-                                </div>
-                                <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
-                                    <img style="width: 30px; height: 30px;" src="trash.png" />
                                 </div>
                                 <hr />
                             </li>
@@ -201,9 +159,6 @@
                                     <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
                                 </div>
                             </div>
-                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
-                                <img style="width: 30px; height: 30px;" src="trash.png" />
-                            </div>
                             <hr />
                         </li>
                     }
@@ -242,9 +197,6 @@
                                     <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
                                 </div>
                             </div>
-                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
-                                <img style="width: 30px; height: 30px;" src="trash.png" />
-                            </div>
                             <hr />
                         </li>
                     }
@@ -270,9 +222,6 @@
                                     <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@item.Content" Lines="3" FullWidth="true" />
                                 </div>
                             </div>
-                            <div @onclick="() => { DeleteItem(item); }" style="background-color: red; text-align: center; height: @item.DeleteHeight; transition: height 0.5s; cursor: pointer;">
-                                <img style="width: 30px; height: 30px;" src="trash.png" />
-                            </div>
                             <hr />
                         </li>
                     }
@@ -280,36 +229,27 @@
             </ul>
         </MudTabPanel>
     </MudTabs>
-    
+
 }
 else
 {
     <h1>You cannot access this List</h1>
 }
 
-
 @code {
-        [Parameter]
-        public string listid { get; set; }
-        [Parameter]
-        public string listname { get; set; }
-        DateTime? NewDate;
-        TimeSpan? NewTime;
-        bool Authorized = false;
-        bool NewImportant = false;
-        string NewTitle = string.Empty;
-        string NewContent = string.Empty;
-        string ContentHeight = "0";
-        string ImportantDisplay = "block";
-        string UncompletedDisplay = "block";
-        string CompletedDisplay = "none";
-        HashSet<ToDoItem> Items = new();
+    private HashSet<ToDoItem> Items = new();
+    private bool Authorized = false;
+    private string NewContent = string.Empty;
+    private string ContentHeight = "0";
+    private string ImportantDisplay = "block";
+    private string UncompletedDisplay = "block";
+    private string CompletedDisplay = "none";
 
     protected override async Task OnInitializedAsync()
     {
         if (sessionsService.session.logged)
         {
-            var res = await listsService.GetItemsAsync(sessionsService.session.username, listid);
+            var res = await listsService.GetTodayItemsAsync(sessionsService.session.username);
             if (res.success)
             {
                 Authorized = true;
@@ -325,10 +265,7 @@ else
             item.DeleteHeight = "0";
             item.ContentHeight = "0";
         });
-        var NewList = new ToDoList() { ListId = listid, Items = Items, Owner = new() { username = sessionsService.session.username } };
-        var task = Task.Factory.StartNew(() => { notificationService.AddNewItems(Items); });
-        await listsService.UpdateListAsync(sessionsService.session.username, NewList);
-        await task;
+        await listsService.UpdateTodayItemsAsync(Items);
     }
 
     private void ShowNewContent()
@@ -379,45 +316,6 @@ else
         }
     }
 
-    private void ResetFields()
-    {
-        NewImportant = false;
-        NewTitle = string.Empty;
-        NewContent = string.Empty;
-        NewDate = null;
-        NewTime = null;
-        ContentHeight = "0";
-    }
-
-    private async Task AddNewItem()
-    {
-        if (string.IsNullOrWhiteSpace(NewTitle))
-        {
-            return;
-        }
-        DateTime? NewRemindTime = null;
-        if (NewTime is not null && NewDate is not null)
-        {
-            NewRemindTime = NewDate.Value.Add(NewTime.Value);
-        }
-        NewTitle = NewTitle.Trim();
-        if (NewTitle.Length > 35)
-        {
-            await JsRuntime.InvokeAsync<object>("alert", "Your title is too long");
-            return;
-        }
-        ToDoItem NewItem = new() { Content = NewContent, Title = NewTitle, TimeCreate = DateTime.Now, Important = NewImportant, TimeRemind = NewRemindTime };
-        Items.Add(NewItem);
-        ResetFields();
-    }
-
-    private async Task DeleteItem(ToDoItem item)
-    {
-        Items.Remove(item);
-        notificationService.DeleteItem(item);
-        await listsService.DeleteItemAsync(item);
-    }
-
     private void ShowMore(ToDoItem item)
     {
         if (item.DeleteHeight == "0")
@@ -432,4 +330,3 @@ else
         }
     }
 }
-

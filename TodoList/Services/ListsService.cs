@@ -31,6 +31,17 @@ namespace TodoList.Services
             return new() { success = true, lists = lists };
         }
 
+        public async Task<ListResult> GetTodayItemsAsync(string username)
+        {
+            var acc = await dbContext.Accounts.FindAsync(username);
+            if (acc is null)
+            {
+                return new() { success = false, err = "username does not exist" };
+            }
+            var items = dbContext.Items.Where(s => s.ParentList.Owner.username == username).ToHashSet();
+            return new() { success = true, items = items };
+        }
+
         public async Task<ListResult> GetItemsAsync(string username, string listid)
         {
             var res = await dbContext.Lists.FindAsync(listid);
@@ -82,6 +93,12 @@ namespace TodoList.Services
                 return new() { success = true };
             }
             return new() { success = false, err = "You cannot access or modify this list" };
+        }
+
+        public async Task UpdateTodayItemsAsync(HashSet<ToDoItem> items)
+        {
+            dbContext.Items.UpdateRange(items);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task<ListResult> DeleteListAsync(string username, string listid)

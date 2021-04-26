@@ -35,7 +35,7 @@ namespace TodoList
             services.AddScoped<SessionsService>();
             services.AddScoped<AccountsService>();
             services.AddScoped<ListsService>();
-            services.AddScoped<NotificationService>();
+            services.AddSingleton<NotificationService>();
             services.AddMudServices();
         }
 

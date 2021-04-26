@@ -1,5 +1,6 @@
 ﻿using ElectronNET.API;
 using ElectronNET.API.Entities;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace TodoList.Services
         public void StartNotification()
         {
             var time = DateTime.Now.ToLocalTime();
-            MyTodoItems = dbContext.Items.Where(s => s.ParentList.Owner.username == sessionsService.session.username && (s.TimeRemind == null || s.TimeRemind.Value >= time)).ToHashSet();
+            MyTodoItems = dbContext.Items.Where(s => !s.Completed && s.ParentList.Owner.username == sessionsService.session.username && (s.TimeRemind == null || s.TimeRemind.Value >= time)).ToHashSet();
             NotificationTracker.Elapsed += (s, e) =>
             {
                 var date = DateTime.Now;
@@ -39,41 +40,85 @@ namespace TodoList.Services
                 List<Task> Tasks = new();
                 Parallel.ForEach(MyTodoItems, item =>
                 {
-
-                    if (item.TimeRemind is not null)
+                    if (MyTodoItems.Contains(item))
                     {
-                        if (item.TimeRemind.Value == date)
+                        if (item.TimeRemind is not null)
                         {
-                            string time = item.TimeRemind.Value.ToString();
-                            var option = new NotificationOptions(item.Title, $"{time}\n{item.Content}")
+                            if (item.TimeRemind.Value == date)
                             {
-                                Icon = icon
-                            };
-                            Electron.Notification.Show(option);
+                                string time = item.TimeRemind.Value.ToString();
+                                var option = new NotificationOptions(item.Title, $"{time}\n{item.Content}")
+                                {
+                                    Icon = icon,
+                                    OnClick = async () =>
+                                    {
+                                        var mainWindow = Electron.WindowManager.BrowserWindows.First();
+                                        var uri = await mainWindow.WebContents.GetUrl();
+                                        var c = 0;
+                                        var base_uri = "";
+                                        for (int i = 0; i < uri.Length; i++)
+                                        {
+                                            base_uri += uri[i];
+                                            if (uri[i] == '/')
+                                            {
+                                                c++;
+                                            }
+                                            if (c == 3)
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        uri = base_uri + "today";
+                                        mainWindow.LoadURL(uri);
+                                    }
+                                };
+                                Electron.Notification.Show(option);
+                            }
+                            if (item.TimeRemind.Value < date)
+                            {
+                                OutdatedItems.Add(item);
+                            }
                         }
-                        if (item.TimeRemind.Value < date)
+                        else
                         {
-                            OutdatedItems.Add(item);
-                        }
-                    }
-                    else
-                    {
-                        if (item.LastNotified is null || item.LastNotified.Value < DateTime.Now.Date)
-                        {
-                            var task = Task.Factory.StartNew(() =>
+                            if (item.LastNotified is null || item.LastNotified.Value < DateTime.Now.Date)
                             {
-                                var todoItem = dbContext.Items.Find(item.ItemId);
-                                todoItem.LastNotified = DateTime.Now.Date;
-                                dbContext.Items.Update(todoItem);
-                                dbContext.SaveChanges();
-                            });
-                            string time = "Daily";
-                            var option = new NotificationOptions(item.Title, $"{time}\n{item.Content}")
-                            {
-                                Icon = icon
-                            };
-                            Electron.Notification.Show(option);
-                            Tasks.Add(task);
+                                var task = Task.Factory.StartNew(() =>
+                                {
+                                    var todoItem = dbContext.Items.Find(item.ItemId);
+                                    todoItem.LastNotified = DateTime.Now.Date;
+                                    dbContext.Items.Update(todoItem);
+                                    dbContext.SaveChanges();
+                                });
+                                string time = "Daily";
+                                var option = new NotificationOptions(item.Title, $"{time}\n{item.Content}")
+                                {
+                                    Icon = icon,
+                                    OnClick = async () =>
+                                    {
+                                        var mainWindow = Electron.WindowManager.BrowserWindows.First();
+                                        var uri = await mainWindow.WebContents.GetUrl();
+                                        var c = 0;
+                                        var base_uri = "";
+                                        for (int i = 0; i < uri.Length; i++)
+                                        {
+                                            base_uri += uri[i];
+                                            if (uri[i] == '/')
+                                            {
+                                                c++;
+                                            }
+                                            if (c == 3)
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        uri = base_uri + "today";
+                                        mainWindow.LoadURL(uri);
+                                    }
+                                };
+                                Electron.Notification.Show(option);
+                                Tasks.Add(task);
+                            }
                         }
                     }
                 });
@@ -91,13 +136,24 @@ namespace TodoList.Services
 
         public void AddNewItems(HashSet<ToDoItem> NewItems)
         {
-            Parallel.ForEach(NewItems, item =>
+            foreach (var item in NewItems)
             {
                 if (!MyTodoItems.Contains(item))
                 {
-                    MyTodoItems.Add(item);
+                    if (!item.Completed)
+                    {
+                        MyTodoItems.Add(item);
+                    }
                 }
-            });
+                else
+                {
+                    Console.WriteLine(item.Title);
+                    if (item.Completed)
+                    {
+                        MyTodoItems.Remove(item);
+                    }
+                }
+            };
         }
 
         public void DeleteItem(ToDoItem Item)
@@ -122,6 +178,7 @@ namespace TodoList.Services
         public void StopNotification()
         {
             NotificationTracker.Stop();
+            NotificationTracker = new(30 * 1000);
             MyTodoItems = new();
         }
     }
