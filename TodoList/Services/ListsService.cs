@@ -42,6 +42,17 @@ namespace TodoList.Services
             return new() { success = true, items = items };
         }
 
+        public async Task<ListResult> GetItemsFromDateAsync(string username, DateTime date)
+        {
+            var acc = await dbContext.Accounts.FindAsync(username);
+            if (acc is null)
+            {
+                return new() { success = false, err = "username does not exist" };
+            }
+            var items = dbContext.Items.Where(s => (s.TimeRemind == null || s.TimeRemind.Value.Date == date) && s.ParentList.Owner.username == username).ToHashSet();
+            return new() { success = true, items = items };
+        }
+
         public async Task<ListResult> GetItemsAsync(string username, string listid)
         {
             var res = await dbContext.Lists.FindAsync(listid);
