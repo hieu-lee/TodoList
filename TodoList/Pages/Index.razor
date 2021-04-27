@@ -9,7 +9,9 @@
 <div>
     <div style="display: flex; justify-content: space-between;">
         <div style="display: flex;">
-            <img @onclick="AddNewList" style="width: 30px; height: 30px; margin-left: 12px; margin-top: 10px; cursor: pointer;" src="addlist.png" />
+            <MudTooltip Text="Add new list">
+                <img @onclick="AddNewList" style="width: 30px; height: 30px; margin-left: 12px; margin-top: 10px; cursor: pointer;" src="addlist.png" />
+            </MudTooltip>
             <MudTextField T="string" FullWidth="true" Placeholder="New Title" @bind-Value="@NewName" Style="margin: 0 10px;"></MudTextField>
         </div>
     </div>
@@ -40,6 +42,9 @@
         </li>
     }
 </ul>
+<MudScrollToTop>
+    <MudFab Color="Color.Primary" Icon="@Icons.Filled.ArrowUpward" />
+</MudScrollToTop>
 
 
 @code {
@@ -82,7 +87,7 @@
 
     private void ManageList(ToDoList list)
     {
-        navigationManager.NavigateTo($"/list/{list.ListId}/{list.Name}");
+        navigationManager.NavigateTo($"/list/{list.ListId}");
     }
 
     private void ShowMore(ToDoList list)

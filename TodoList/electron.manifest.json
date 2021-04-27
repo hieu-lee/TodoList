@@ -4,13 +4,13 @@
     "imageFile": ""
   },
   "name": "TodoList",
-  "author": "",
+  "author": "Hieu Le",
   "singleInstance": false,
   "environment": "Production",
   "build": {
     "appId": "com.TodoList.app",
     "productName": "TodoList",
-    "copyright": "Copyright © 2020",
+    "copyright": "Copyright © 2021",
     "buildVersion": "1.0.0",
     "compression": "maximum",
     "directories": {

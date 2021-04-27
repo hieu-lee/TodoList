@@ -38,7 +38,7 @@ namespace TodoList.Services
             {
                 return new() { success = false, err = "username does not exist" };
             }
-            var items = dbContext.Items.Where(s => s.ParentList.Owner.username == username).ToHashSet();
+            var items = dbContext.Items.Where(s => (s.TimeRemind == null || s.TimeRemind.Value.Date == DateTime.Now.Date) && s.Owner == username).ToHashSet();
             return new() { success = true, items = items };
         }
 
@@ -49,7 +49,7 @@ namespace TodoList.Services
             {
                 return new() { success = false, err = "username does not exist" };
             }
-            var items = dbContext.Items.Where(s => (s.TimeRemind == null || s.TimeRemind.Value.Date == date) && s.ParentList.Owner.username == username).ToHashSet();
+            var items = dbContext.Items.Where(s => (s.TimeRemind == null || s.TimeRemind.Value.Date == date) && s.Owner == username).ToHashSet();
             return new() { success = true, items = items };
         }
 
@@ -62,8 +62,8 @@ namespace TodoList.Services
             }
             if (res.Owner.username == username) 
             {
-                var items = dbContext.Items.Where(s => s.ParentList.ListId == listid).ToHashSet();
-                return new() { success = true, items = items };
+                var items = dbContext.Items.Where(s => s.ParentListId == listid).ToHashSet();
+                return new() { success = true, items = items, name = res.Name };
             }
             return new() { success = false, err = "You cannot access or modify this list" };
         }
@@ -93,10 +93,6 @@ namespace TodoList.Services
             }
             if (oldlist.Owner.username == username) 
             {
-                Parallel.ForEach(list.Items, item =>
-                {
-                    item.ParentList = oldlist;
-                });
                 oldlist.Items = list.Items;
                 oldlist.TimeCreate = list.TimeCreate;
                 dbContext.Lists.Update(oldlist);

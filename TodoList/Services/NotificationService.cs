@@ -31,14 +31,14 @@ namespace TodoList.Services
         public void StartNotification()
         {
             var time = DateTime.Now.ToLocalTime();
-            MyTodoItems = dbContext.Items.Where(s => !s.Completed && s.ParentList.Owner.username == sessionsService.session.username && (s.TimeRemind == null || s.TimeRemind.Value >= time)).ToHashSet();
+            MyTodoItems = dbContext.Items.Where(s => !s.Completed && s.Owner == sessionsService.session.username && (s.TimeRemind == null || s.TimeRemind.Value >= time)).ToHashSet();
             NotificationTracker.Elapsed += (s, e) =>
             {
-                var date = DateTime.Now;
+                var date = DateTime.Now.ToLocalTime();
                 date = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second, date.Kind);
                 List<ToDoItem> OutdatedItems = new();
                 List<Task> Tasks = new();
-                Parallel.ForEach(MyTodoItems, item =>
+                foreach (var item in MyTodoItems)
                 {
                     if (MyTodoItems.Contains(item))
                     {
@@ -68,11 +68,15 @@ namespace TodoList.Services
                                                 break;
                                             }
                                         }
-                                        uri = base_uri + "today";
-                                        mainWindow.LoadURL(uri);
+                                        var todayUri = base_uri + "today";
+                                        if (uri != todayUri)
+                                        {
+                                            mainWindow.LoadURL(uri);
+                                        }
                                     }
                                 };
                                 Electron.Notification.Show(option);
+                                OutdatedItems.Add(item);
                             }
                             if (item.TimeRemind.Value < date)
                             {
@@ -112,8 +116,11 @@ namespace TodoList.Services
                                                 break;
                                             }
                                         }
-                                        uri = base_uri + "today";
-                                        mainWindow.LoadURL(uri);
+                                        var todayUri = base_uri + "today";
+                                        if (uri != todayUri)
+                                        {
+                                            mainWindow.LoadURL(uri);
+                                        }
                                     }
                                 };
                                 Electron.Notification.Show(option);
@@ -121,7 +128,7 @@ namespace TodoList.Services
                             }
                         }
                     }
-                });
+                };
                 Parallel.ForEach(OutdatedItems, item =>
                 {
                     MyTodoItems.Remove(item);
@@ -138,19 +145,21 @@ namespace TodoList.Services
         {
             foreach (var item in NewItems)
             {
-                if (!MyTodoItems.Contains(item))
+                if (item.TimeRemind == null || item.TimeRemind.Value >= DateTime.Now.ToLocalTime())
                 {
-                    if (!item.Completed)
+                    if (!MyTodoItems.Contains(item))
                     {
-                        MyTodoItems.Add(item);
+                        if (!item.Completed)
+                        {
+                            MyTodoItems.Add(item);
+                        }
                     }
-                }
-                else
-                {
-                    Console.WriteLine(item.Title);
-                    if (item.Completed)
+                    else
                     {
-                        MyTodoItems.Remove(item);
+                        if (item.Completed)
+                        {
+                            MyTodoItems.Remove(item);
+                        }
                     }
                 }
             };

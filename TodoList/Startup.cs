@@ -32,10 +32,10 @@ namespace TodoList
                 options.UseSqlite("Data Source = todolist.db");
             }, ServiceLifetime.Singleton);
             services.AddSingleton<EncryptionAndCompressService>();
-            services.AddScoped<SessionsService>();
+            services.AddSingleton<SessionsService>();
+            services.AddSingleton<NotificationService>();
             services.AddScoped<AccountsService>();
             services.AddScoped<ListsService>();
-            services.AddSingleton<NotificationService>();
             services.AddMudServices();
         }
 

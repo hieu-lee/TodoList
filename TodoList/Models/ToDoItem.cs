@@ -7,7 +7,8 @@ namespace TodoList.Models
     {
         [Key]
         public string ItemId { get; set; } = Guid.NewGuid().ToString();
-        public ToDoList ParentList { get; set; }
+        public string ParentListId { get; set; }
+        public string Owner { get; set; }
         public DateTime TimeCreate { get; set; }
         public DateTime? TimeRemind { get; set; }
         public bool Important { get; set; } = false;

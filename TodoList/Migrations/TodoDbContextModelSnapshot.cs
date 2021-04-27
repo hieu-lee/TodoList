@@ -69,7 +69,10 @@ namespace TodoList.Migrations
                     b.Property<DateTime?>("LastNotified")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ParentListListId")
+                    b.Property<string>("Owner")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ParentListId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("TimeCreate")
@@ -81,9 +84,12 @@ namespace TodoList.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ToDoListListId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ItemId");
 
-                    b.HasIndex("ParentListListId");
+                    b.HasIndex("ToDoListListId");
 
                     b.ToTable("Items");
                 });
@@ -114,11 +120,9 @@ namespace TodoList.Migrations
 
             modelBuilder.Entity("TodoList.Models.ToDoItem", b =>
                 {
-                    b.HasOne("TodoList.Models.ToDoList", "ParentList")
+                    b.HasOne("TodoList.Models.ToDoList", null)
                         .WithMany("Items")
-                        .HasForeignKey("ParentListListId");
-
-                    b.Navigation("ParentList");
+                        .HasForeignKey("ToDoListListId");
                 });
 
             modelBuilder.Entity("TodoList.Models.ToDoList", b =>
