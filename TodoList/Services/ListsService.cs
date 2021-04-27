@@ -44,6 +44,7 @@ namespace TodoList.Services
 
         public async Task<ListResult> GetItemsFromDateAsync(string username, DateTime date)
         {
+            date = date.Date;
             var acc = await dbContext.Accounts.FindAsync(username);
             if (acc is null)
             {

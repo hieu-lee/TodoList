@@ -36,6 +36,7 @@ namespace TodoList
             services.AddSingleton<NotificationService>();
             services.AddScoped<AccountsService>();
             services.AddScoped<ListsService>();
+            services.AddScoped<DateService>();
             services.AddMudServices();
         }
 
