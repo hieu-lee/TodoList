@@ -69,12 +69,6 @@ namespace TodoList.Services
             return new() { success = false, err = "You cannot access or modify this list" };
         }
 
-        public bool FindAccount(string username)
-        {
-            var acc = dbContext.Accounts.Find(username);
-            return (acc is not null);
-        }
-
         public async Task CreateNewListAsync(string username, ToDoList list)
         {
             var myacc = dbContext.Accounts.Find(username);
@@ -132,7 +126,8 @@ namespace TodoList.Services
 
         public async Task DeleteItemAsync(ToDoItem item)
         {
-            await Task.Run(() => dbContext.Items.Remove(item));
+            dbContext.Items.Remove(item);
+            await dbContext.SaveChangesAsync();
         }
     }
 }
